@@ -5,6 +5,8 @@ import * as demo from '@/lib/demo/store';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { rowToUser } from '@/lib/supabase/mappers';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const userId = getSessionUserId();
   if (!userId) return NextResponse.json({ profile: null });

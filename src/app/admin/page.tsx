@@ -21,6 +21,7 @@ export default function AdminPage() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [mode, setMode] = useState<{ demoMode: boolean; spotifyConnected: boolean } | null>(null);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [selectingDevice, setSelectingDevice] = useState<string | null>(null);
   const [joinUrl, setJoinUrl] = useState('');
 
   useEffect(() => {
@@ -58,6 +59,24 @@ export default function AdminPage() {
 
   async function playbackAction(action: 'play' | 'pause' | 'skip') {
     await fetch(`/api/spotify/${action}`, { method: 'POST' });
+  }
+
+  async function selectDevice(deviceId: string) {
+    setSelectingDevice(deviceId);
+    const res = await fetch('/api/spotify/transfer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deviceId }),
+    });
+    setSelectingDevice(null);
+    if (res.ok) {
+      setDevices((prev) => prev.map((d) => ({ ...d, isActive: d.id === deviceId })));
+      setSaveMessage('Playback device set');
+      setTimeout(() => setSaveMessage(null), 1500);
+    } else {
+      setSaveMessage('Could not switch devices');
+      setTimeout(() => setSaveMessage(null), 2000);
+    }
   }
 
   async function logout() {
@@ -122,11 +141,17 @@ export default function AdminPage() {
             <p className="mb-2 text-sm font-medium text-mist-100">Playback device</p>
             <div className="mb-3 flex flex-wrap gap-2">
               {devices.map((d) => (
-                <span key={d.id} className={`pill ${d.isActive ? 'border-dial-violet' : ''}`}>
-                  {d.name}
-                </span>
+                <button
+                  key={d.id}
+                  onClick={() => selectDevice(d.id)}
+                  disabled={selectingDevice === d.id}
+                  className={`pill transition hover:bg-white/10 ${d.isActive ? 'border-dial-violet bg-dial-violet/10' : ''} ${selectingDevice === d.id ? 'opacity-60' : ''}`}
+                >
+                  {d.isActive && '🔊 '}
+                  {selectingDevice === d.id ? 'Switching…' : d.name}
+                </button>
               ))}
-              {devices.length === 0 && <span className="text-xs text-mist-500">No devices found — open Spotify on the office speakers first.</span>}
+              {devices.length === 0 && <span className="text-xs text-mist-500">No devices found — open Spotify on the office speakers first, then refresh this page.</span>}
             </div>
             <div className="flex gap-2">
               <button onClick={() => playbackAction('play')} className="btn-secondary !px-3 !py-2 text-xs">▶ Play</button>

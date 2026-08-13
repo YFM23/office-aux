@@ -4,6 +4,8 @@ import { isAdminSession } from '@/lib/session';
 import * as spotify from '@/lib/spotify/client';
 import { isSpotifyConnected } from '@/lib/spotify/tokenStore';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   if (!isAdminSession()) return NextResponse.json({ error: 'Admin only.' }, { status: 403 });
 

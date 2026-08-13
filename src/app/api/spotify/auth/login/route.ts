@@ -3,6 +3,8 @@ import { randomBytes } from 'crypto';
 import { SPOTIFY_ACCOUNTS_BASE, SPOTIFY_SCOPES } from '@/lib/spotify/limitations';
 import { isAdminSession } from '@/lib/session';
 
+export const dynamic = 'force-dynamic';
+
 // Starts the Spotify OAuth Authorization Code flow for the HOST account
 // only. Admin-gated: a team member's browser can never trigger this.
 export async function GET() {

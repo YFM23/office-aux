@@ -15,7 +15,7 @@ export async function GET() {
   }
 
   const sb = supabaseAdmin();
-  const [{ data: rows }, { data: adminRow }, { data: history }] = await Promise.all([
+  const [requestsRes, adminRes, historyRes] = await Promise.all([
     sb
       .from('song_requests')
       .select('id, requested_by, created_at, spotify_tracks(*), users(nickname)')
@@ -23,6 +23,14 @@ export async function GET() {
     sb.from('admin_settings').select('*').eq('id', true).single(),
     sb.from('play_history').select('*').order('played_at', { ascending: false }).limit(6),
   ]);
+
+  if (requestsRes.error) {
+    console.error('GET /api/requests song_requests query failed:', requestsRes.error);
+    return NextResponse.json({ queue: [], debugError: requestsRes.error }, { status: 200 });
+  }
+
+  const rows = requestsRes.data;
+  const history = historyRes.data;
 
   const votesRes = await sb.from('song_votes').select('request_id, value');
   const voteTotals = new Map<string, number>();

@@ -3,6 +3,8 @@ import { SPOTIFY_ACCOUNTS_BASE } from '@/lib/spotify/limitations';
 import { saveTokens } from '@/lib/spotify/tokenStore';
 import { isAdminSession, getSessionUserId } from '@/lib/session';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   if (!isAdminSession()) {
     return NextResponse.redirect(new URL('/admin/login', req.url));
