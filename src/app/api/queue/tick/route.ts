@@ -106,7 +106,7 @@ export async function POST() {
   // Pick what plays next: top of our ranked queue, or Auto DJ.
   const { data: pendingRows } = await sb
     .from('song_requests')
-    .select('id, requested_by, created_at, spotify_tracks(*), users(nickname)')
+    .select('id, requested_by, created_at, spotify_tracks(*), users!song_requests_requested_by_fkey(nickname)')
     .eq('status', 'queued');
   const { data: recentHistoryRows } = await sb
     .from('play_history')

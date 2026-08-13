@@ -18,7 +18,7 @@ export async function GET() {
   const [requestsRes, adminRes, historyRes] = await Promise.all([
     sb
       .from('song_requests')
-      .select('id, requested_by, created_at, spotify_tracks(*), users(nickname)')
+      .select('id, requested_by, created_at, spotify_tracks(*), users!song_requests_requested_by_fkey(nickname)')
       .eq('status', 'queued'),
     sb.from('admin_settings').select('*').eq('id', true).single(),
     sb.from('play_history').select('*').order('played_at', { ascending: false }).limit(6),
@@ -26,7 +26,7 @@ export async function GET() {
 
   if (requestsRes.error) {
     console.error('GET /api/requests song_requests query failed:', requestsRes.error);
-    return NextResponse.json({ queue: [], debugError: requestsRes.error }, { status: 200 });
+    return NextResponse.json({ queue: [] }, { status: 200 });
   }
 
   const rows = requestsRes.data;
