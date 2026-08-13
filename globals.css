@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  background-color: #06070c;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+::selection {
+  background: rgba(124, 92, 255, 0.35);
+}
+
+/* Custom scrollbar — subtle, matches the ink palette rather than the
+   browser default, without being obtrusive. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e2433; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #2a3244; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Signature element: the record-groove ring around album art on Now
+   Playing. Pure CSS conic-gradient, no images. */
+.groove-ring {
+  background: conic-gradient(from 0deg, rgba(124,92,255,0.9), rgba(255,107,92,0.9), rgba(124,92,255,0.9));
+}
+
+.card {
+  @apply rounded-xl2 border border-white/5 bg-ink-850 shadow-card;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full bg-aux-gradient px-5 py-3 font-display text-sm font-semibold text-white shadow-glow transition active:scale-95;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 font-display text-sm font-semibold text-mist-100 transition hover:bg-white/10 active:scale-95;
+}
+
+.pill {
+  @apply inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-mist-300;
+}
