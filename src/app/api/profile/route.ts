@@ -3,6 +3,7 @@ import { isDemoMode } from '@/lib/mode';
 import { getSessionUserId } from '@/lib/session';
 import * as demo from '@/lib/demo/store';
 import { supabaseAdmin } from '@/lib/supabase/server';
+import { rowToUser } from '@/lib/supabase/mappers';
 
 export async function GET() {
   const userId = getSessionUserId();
@@ -14,7 +15,7 @@ export async function GET() {
   }
 
   const { data } = await supabaseAdmin().from('users').select('*').eq('id', userId).maybeSingle();
-  return NextResponse.json({ profile: data ?? null });
+  return NextResponse.json({ profile: data ? rowToUser(data) : null });
 }
 
 export async function POST(req: NextRequest) {
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Could not create your profile.' }, { status: 500 });
   }
 
-  const res = NextResponse.json({ profile: data });
+  const res = NextResponse.json({ profile: rowToUser(data) });
   res.cookies.set('office_aux_uid', data.id, { httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 365, path: '/' });
   return res;
 }

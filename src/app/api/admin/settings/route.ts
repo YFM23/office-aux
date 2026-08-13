@@ -7,11 +7,34 @@ import type { AdminSettings } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
+function rowToAdminSettings(row: any): AdminSettings {
+  return {
+    explicitAllowed: row.explicit_allowed,
+    requestsEnabled: row.requests_enabled,
+    maxActiveRequestsPerPerson: row.max_active_requests_per_person,
+    songCooldownMinutes: row.song_cooldown_minutes,
+    artistCooldownMinutes: row.artist_cooldown_minutes,
+    maxConsecutiveTracksFromOneRequester: row.max_consecutive_tracks_from_one_requester,
+    votingEnabled: row.voting_enabled,
+    skipVoteThreshold: row.skip_vote_threshold,
+    autoDjEnabled: row.auto_dj_enabled,
+    vibeVotingEnabled: row.vibe_voting_enabled,
+    partyModeEnabled: row.party_mode_enabled,
+    blockedTrackIds: row.blocked_track_ids ?? [],
+    blockedArtists: row.blocked_artists ?? [],
+    blockedGenres: row.blocked_genres ?? [],
+    officeHours: row.office_hours_open ? { open: row.office_hours_open, close: row.office_hours_close } : null,
+    messageTone: row.message_tone,
+    defaultSpotifyDeviceId: row.default_spotify_device_id,
+  };
+}
+
 export async function GET() {
   if (isDemoMode()) return NextResponse.json({ settings: demo.getAdminSettings() });
 
-  const { data } = await supabaseAdmin().from('admin_settings').select('*').eq('id', true).single();
-  return NextResponse.json({ settings: data });
+  const { data, error } = await supabaseAdmin().from('admin_settings').select('*').eq('id', true).single();
+  if (error || !data) return NextResponse.json({ settings: null, error: 'Could not load settings.' }, { status: 200 });
+  return NextResponse.json({ settings: rowToAdminSettings(data) });
 }
 
 export async function PATCH(req: NextRequest) {
@@ -45,5 +68,5 @@ export async function PATCH(req: NextRequest) {
 
   const { data, error } = await supabaseAdmin().from('admin_settings').update(row).eq('id', true).select().single();
   if (error) return NextResponse.json({ error: 'Could not save settings.' }, { status: 500 });
-  return NextResponse.json({ settings: data });
+  return NextResponse.json({ settings: rowToAdminSettings(data) });
 }
